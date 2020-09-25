@@ -1,0 +1,39 @@
+name: git-pr-release
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [master]
+    types: [synchronize]
+
+jobs:
+  git-pr-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: unshallow
+        run: git fetch --prune --unshallow
+
+      - name: git-pr-release.dry_run
+        if: github.actor == 'nektos/act'
+        uses: docker://kei2100/git-pr-release:v1.4.0@sha256:8a1473a0bd3975da2c327379484764db15b09320901b19eefbed9c1be8969e41
+        with:
+          entrypoint: git-pr-release
+          args: --dry-run
+        env:
+          GIT_PR_RELEASE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIT_PR_RELEASE_BRANCH_STAGING: develop
+          GIT_PR_RELEASE_BRANCH_PRODUCTION: master
+
+      - name: git-pr-release
+        if: github.actor != 'nektos/act'
+        uses: docker://kei2100/git-pr-release:v1.4.0@sha256:8a1473a0bd3975da2c327379484764db15b09320901b19eefbed9c1be8969e41
+        with:
+          entrypoint: git-pr-release
+        env:
+          GIT_PR_RELEASE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIT_PR_RELEASE_BRANCH_STAGING: develop
+          GIT_PR_RELEASE_BRANCH_PRODUCTION: master
+
