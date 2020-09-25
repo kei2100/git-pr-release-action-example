@@ -1,8 +1,8 @@
 ACT_EVENT = workflow_dispatch
 ACT_PLATFORM = ubuntu-latest=nektos/act-environments-ubuntu:18.04
 
-.PHONY: gha.docker-push
-gha.docker-push: gha.init-github_token
+.PHONY: gha.workflow_dispatch.dryrun
+gha.workflow_dispatch.dryrun: gha.init-github_token
 	@which act > /dev/null 2>&1 || brew install nektos/tap/act
 	@act $(ACT_EVENT) \
 		--platform=$(ACT_PLATFORM) \
